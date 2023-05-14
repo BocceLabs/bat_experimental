@@ -1,1 +1,2 @@
 kivy
+opencv-contrib-python

@@ -1,0 +1,11 @@
+BoxLayout:
+    orientation: 'vertical'
+
+    BoxLayout:
+        id: camera_container
+        size_hint_y: 0.9
+
+    Button:
+        text: 'Exit'
+        size_hint_y: 0.1
+        on_press: app.stop()
