@@ -4,26 +4,44 @@ from kivy.clock import Clock
 from kivy.uix.floatlayout import FloatLayout
 from kivy.uix.image import Image
 from kivy.uix.widget import Widget
-from kivy.graphics import Color, Line, Rectangle, Ellipse
+from kivy.graphics import Color, Line, Rectangle
+from kivy.core.window import Window
 from kivy.graphics.texture import Texture
 import cv2
 import numpy as np
+from kivy.config import Config
+
+Config.set('input', 'mouse', 'mouse,multitouch_on_demand')
 
 
 class DrawingWidget(Widget):
     def __init__(self, **kwargs):
         super(DrawingWidget, self).__init__(**kwargs)
         self.strokes = []
+        self.mouse_down = False
 
     def on_touch_down(self, touch):
-        with self.canvas:
-            Color(1, 1, 1)
-            touch.ud["line"] = Line(points=(touch.x, touch.y), width=5)
-            self.strokes.append([(touch.x, touch.y)])
+        if touch.is_mouse_scrolling:
+            return False
+
+        if touch.button == 'right':
+            self.canvas.clear()
+            self.strokes = []
+            return True
+
+        elif touch.button == 'left':
+            with self.canvas:
+                Color(1, 1, 1)
+                touch.ud["line"] = Line(points=(touch.x, touch.y), width=5)
+                self.strokes.append([(touch.x, touch.y)])
 
     def on_touch_move(self, touch):
-        touch.ud["line"].points += (touch.x, touch.y)
-        self.strokes[-1].append((touch.x, touch.y))
+        if touch.button == 'right':
+            return
+
+        if touch.button == 'left':
+            touch.ud["line"].points += (touch.x, touch.y)
+            self.strokes[-1].append((touch.x, touch.y))
 
 class MainWidget(FloatLayout):
     def __init__(self, **kwargs):
@@ -63,6 +81,7 @@ class MainWidget(FloatLayout):
                 points = []
                 for point in stroke:
                     points.extend([point[0], point[1]])
+                Color(1, 0, 0)
                 Line(points=points, width=5)
 
 
